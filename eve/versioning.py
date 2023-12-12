@@ -139,10 +139,15 @@ def insert_versioning_documents(resource, documents):
             ver_doc = {}
 
             # push normal fields
-            fields = versioned_fields(resource_def)
-            for field in document:
-                if field in fields:
-                    ver_doc[field] = document[field]
+            if resource_def["allow_unknown"]:
+                for field in document:
+                    if field not in [app.config["ID_FIELD"], app.config["ETAG"]]:
+                        ver_doc[field] = document[field]
+            else:
+                fields = versioned_fields(resource_def)
+                for field in document:
+                    if field in fields:
+                        ver_doc[field] = document[field]
 
             # push special fields
             ver_doc[versioned_id_field(resource_def)] = document[_id]
